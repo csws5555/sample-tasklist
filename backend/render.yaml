@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: task-manager-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server.js
+    env: node
+    database:
+      name: taskdb
+      plan: free

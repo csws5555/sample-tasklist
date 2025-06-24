@@ -5,13 +5,34 @@ const path = require('path');
 
 const app = express();
 const PORT = 3001;
+// add this
+const isProduction = process.env.NODE_ENV === 'production';
 
-// Middleware
-app.use(cors());
+// CORS configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://your-netlify-app.netlify.app' // Replace with your actual Netlify URL
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-// Database setup
-const dbPath = path.join(__dirname, 'tasks.db');
+// Database setup - different paths for dev vs production
+const dbPath = isProduction
+  ? '/opt/render/project/src/tasks.db'
+  : path.join(__dirname, 'tasks.db');
+  
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {
     console.error('Error opening database:', err.message);
